@@ -28,6 +28,7 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
 class RecipePostSerializer(serializers.ModelSerializer):
     author = serializers.PrimaryKeyRelatedField(
         read_only=True,
+        default=serializers.CurrentUserDefault()
     )
     ingredients = RecipeIngredientSerializer(many=True, required=False)
     tags = serializers.PrimaryKeyRelatedField(

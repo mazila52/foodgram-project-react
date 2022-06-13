@@ -11,5 +11,4 @@ urlpatterns = [
     path('auth/', include('djoser.urls.authtoken')),
     path('tags/', TagList.as_view()), 
     path('tags/<int:pk>/', TagDetail.as_view()),
-    #path('recipes/', include(router.urls)),    
 ]
