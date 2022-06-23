@@ -1,9 +1,7 @@
-from asyncio.proactor_events import constants
-from tabnanny import verbose
-from django.db import models
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.validators import RegexValidator, MinValueValidator
+from django.core.validators import MinValueValidator, RegexValidator
+from django.db import models
 
 User = get_user_model
 
@@ -16,7 +14,7 @@ class Tag(models.Model):
     )
     color = models.CharField(
         max_length=7,
-        validators = [RegexValidator(regex='#[0-9A-F]{6}$')],
+        validators=[RegexValidator(regex='#[0-9A-F]{6}$')],
         unique=True
     )
     slug = models.SlugField(
@@ -29,9 +27,12 @@ class Tag(models.Model):
         verbose_name = 'Тэг'
         verbose_name_plural = 'Тэги'
         constraints = [
-            models.UniqueConstraint(fields=['name', 'slug'], name='Unique_of_tags')
+            models.UniqueConstraint(
+                fields=['name', 'slug'],
+                name='Unique_of_tags'
+            )
         ]
-    
+
     def __str__(self) -> str:
         return self.name
 
@@ -49,7 +50,7 @@ class Ingredient(models.Model):
     class Meta:
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
-    
+
     def __str__(self) -> str:
         return self.name
 
@@ -63,7 +64,8 @@ class Recipe(models.Model):
     )
     ingredients = models.ManyToManyField(
         Ingredient,
-        through='RecipeIngredient'
+        through='RecipeIngredient',
+        related_name='ing_recipes'
     )
     tags = models.ManyToManyField(
         Tag,
@@ -94,17 +96,20 @@ class Recipe(models.Model):
         ordering = ('-pub_date',)
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
+
     def __str__(self) -> str:
         return self.name
+
 
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='recipes'
+        related_name='ing_in_recipe'
+
     )
     ingredient = models.ForeignKey(
-        Ingredient, 
+        Ingredient,
         on_delete=models.CASCADE,
         related_name='recipes'
     )
@@ -114,6 +119,9 @@ class RecipeIngredient(models.Model):
             MinValueValidator(1)
         ]
     )
+
+    def __str__(self):
+        return f'{self.ingredient} {self.recipe}'
 
     class Meta:
         verbose_name = 'Количество ингредиента в рецепте'
@@ -125,7 +133,7 @@ class RecipeIngredient(models.Model):
             )
         ]
 
-  
+
 class Subscription(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -139,6 +147,8 @@ class Subscription(models.Model):
     )
 
     class Meta:
+        verbose_name = 'Подписки'
+        verbose_name_plural = 'Подписки'
         constraints = [
             models.UniqueConstraint(
                 fields=['user', 'is_subscribed'],
@@ -160,9 +170,32 @@ class Favorites(models.Model):
 
     class Meta:
         verbose_name = 'Избранное'
+        verbose_name_plural = 'Избранное'
         constraints = [
             models.UniqueConstraint(
                 fields=['user', 'recipe'],
                 name='unique_favorite_recipe'
+            )
+        ]
+
+
+class Purchase(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='purchase'
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE
+    )
+
+    class Meta:
+        verbose_name = 'Покупка'
+        verbose_name_plural = 'Покупки'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'],
+                name='unique_purchase_recipe'
             )
         ]
