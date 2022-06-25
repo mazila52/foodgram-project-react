@@ -120,9 +120,6 @@ class RecipeIngredient(models.Model):
         ]
     )
 
-    def __str__(self):
-        return f'{self.ingredient} {self.recipe}'
-
     class Meta:
         verbose_name = 'Количество ингредиента в рецепте'
         verbose_name_plural = 'Количество ингредиентов в рецепте'
@@ -132,6 +129,9 @@ class RecipeIngredient(models.Model):
                 name='unique_ingredients_in_recipe'
             )
         ]
+
+    def __str__(self):
+        return f'{self.ingredient} {self.recipe}'
 
 
 class Subscription(models.Model):
