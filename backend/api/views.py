@@ -9,7 +9,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from foodgram.models import (Favorites, Ingredient, Purchase, Recipe,
+from foodgram.models import (Favorite, Ingredient, Purchase, Recipe,
                              RecipeIngredient, Subscription, Tag)
 from users.models import User
 
@@ -62,7 +62,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def delete_favorite(self, request, pk):
         user = User.objects.get(id=request.user.id)
         recipe = Recipe.objects.get(id=pk)
-        instance = Favorites.objects.get(user=user, recipe=recipe)
+        instance = Favorite.objects.get(user=user, recipe=recipe)
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -114,7 +114,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Recipe.objects.all()
         is_in_shopping = self.request.query_params.get('is_in_shoppong_cart')
         is_favorite = self.request.query_params.get('is_favorite')
-        is_favor = Favorites.objects.filter(
+        is_favor = Favorite.objects.filter(
             recipe=OuterRef('pk'),
             user=self.request.user
         )
