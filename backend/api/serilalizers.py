@@ -143,7 +143,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         read_only=True,
         default=serializers.CurrentUserDefault()
     )
-    is_subscribed = serializers.PrimaryKeyRelatedField(
+    subscribed_to = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all()
     )
 
@@ -154,11 +154,11 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         validators = [
             UniqueTogetherValidator(
                 queryset=Subscription.objects.all(),
-                fields=('user', 'is_subscribed')
+                fields=('user', 'subscribed_to')
             )
         ]
 
-    def validate_is_subscribed(self, is_subscribed):
+    def validate_subscribed_to(self, is_subscribed):
         user = self.context['request'].user
         if user == is_subscribed:
             raise serializers.ValidationError(
