@@ -36,7 +36,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipePostSerializer
     permission_classes = [OwnerOrReadOnly, ]
-    filter_backends = (DjangoFilterBackend, OrderingFilter, RecipeFilter)
+    filter_backends = (DjangoFilterBackend, RecipeFilter)
     filterset_fileds = ('tags__slug',)
     ordering = ('-id')
     pagination_class = RecipesCustomPagination
@@ -111,7 +111,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         if self.request.user.is_anonymous:
-            return Recipe.objects.all
+            return Recipe.objects.all()
         is_in_shopping = self.request.query_params.get('is_in_shoppong_cart')
         is_favorite = self.request.query_params.get('is_favorite')
         is_favor = Favorites.objects.filter(

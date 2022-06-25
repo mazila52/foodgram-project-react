@@ -7,10 +7,4 @@ class RecipeFilter(BaseFilterBackend):
         if tags:
             queryset = queryset.filter(tags__slug__in=tags).distinct()
 
-        author = request.query_params.get('author')
-        if author:
-            queryset = queryset.filter(author=author)
-
-        user = request.user
-        if user.is_anonymous:
-            return queryset
+        return queryset
