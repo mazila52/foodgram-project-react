@@ -1,6 +1,6 @@
-from rest_framework.filters import BaseFilterBackend
+from django.db.models import Exists, OuterRef
 from foodgram.models import Favorite, Purchase
-from django.db.models import OuterRef, Exists
+from rest_framework.filters import BaseFilterBackend
 
 
 class RecipeFilter(BaseFilterBackend):
