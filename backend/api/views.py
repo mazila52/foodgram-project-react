@@ -1,18 +1,16 @@
 import csv
 
-from django.db.models import Exists, OuterRef, Sum
+from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, mixins, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from foodgram.models import (Favorite, Ingredient, Purchase, Recipe,
                              RecipeIngredient, Subscription, Tag)
-from users.models import User
 from .filters import RecipeFilter
 from .paginators import RecipesCustomPagination
 from .permissions import OwnerOrReadOnly
@@ -22,7 +20,6 @@ from .serilalizers import (FavoritesSerializer, IngredientSerializer,
                            TagSerializer)
 
 
-@action(detail=True)
 class TagViewSet(mixins.ListModelMixin,
                  mixins.RetrieveModelMixin,
                  viewsets.GenericViewSet):
@@ -52,7 +49,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             'recipe': recipe.id,
         }
         serializer = input_serializer(data=data)
-        serializer.is_valid()
+        serializer.is_valid(raise_exception=True)
         serializer.save(user=user)
 
     def _del_favorite_or_purchase(self, request, pk, model):
@@ -68,7 +65,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @favorite.mapping.delete
     def delete_favorite(self, request, pk):
-        self._del_favorite_or_purchase(request,pk, Favorite)
+        self._del_favorite_or_purchase(request, pk, Favorite)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, methods=['post', ])
@@ -78,7 +75,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @shopping_cart.mapping.delete
     def delete_shopping_cart(self, request, pk):
-        self._del_favorite_or_purchase(request,pk, Purchase)
+        self._del_favorite_or_purchase(request, pk, Purchase)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=['get', ])
@@ -104,7 +101,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             writer.writerow(row)
         return response
 
- 
+
 class SubscriptionList(generics.ListAPIView):
     serializer_class = SubscriptionSerializer
 

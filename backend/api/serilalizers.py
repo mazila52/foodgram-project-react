@@ -133,14 +133,12 @@ class RecipePostSerializer(serializers.ModelSerializer):
             amount = ingredient.get('amount')
             temp_list.append(
                 RecipeIngredient(
-                recipe=recipe,
-                ingredient=ingredient_id,
-                amount=amount
+                    recipe=recipe,
+                    ingredient=ingredient_id,
+                    amount=amount
                 )
             )
         RecipeIngredient.objects.bulk_create(temp_list)
-
-
 
     def create(self, validated_data):
         author = self.context['request'].user
@@ -158,8 +156,6 @@ class RecipePostSerializer(serializers.ModelSerializer):
         RecipeIngredient.objects.filter(recipe=instance).delete()
         self._add_ingredients(instance, ingredients)
         return super().update(instance, validated_data)
-
-    
 
 
 class SubscriptionSerializer(serializers.ModelSerializer):
