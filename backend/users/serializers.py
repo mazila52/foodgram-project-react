@@ -1,7 +1,8 @@
 from django.contrib.auth import get_user_model
 from djoser.serializers import (UserCreateSerializer, UserSerializer,
                                 serializers)
-from foodgram.models import Subscription
+
+from ..foodgram.models import Subscription
 
 User = get_user_model()
 

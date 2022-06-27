@@ -1,6 +1,7 @@
 from django.db.models import Exists, OuterRef
-from foodgram.models import Favorite, Purchase
 from rest_framework.filters import BaseFilterBackend
+
+from ..foodgram.models import Favorite, Purchase
 
 
 class RecipeFilter(BaseFilterBackend):
@@ -16,7 +17,7 @@ class RecipeFilter(BaseFilterBackend):
         user = request.user
         if user.is_anonymous:
             return queryset
-        
+
         is_in_shopping = request.query_params.get('is_in_shoppong_cart')
         is_favorite = request.query_params.get('is_favorite')
         is_favor = Favorite.objects.filter(
