@@ -1,7 +1,7 @@
 from django.db.models import Exists, OuterRef
 from rest_framework.filters import BaseFilterBackend
 
-from ..foodgram.models import Favorite, Purchase
+from foodgram.models import Favorite, Purchase
 
 
 class RecipeFilter(BaseFilterBackend):
