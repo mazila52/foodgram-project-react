@@ -1,11 +1,12 @@
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
+
+
+from foodgram.models import (Favorite, Ingredient, Purchase,
+                             Recipe, RecipeIngredient, Subscription, Tag)
 from users.models import User
 from users.serializers import CustomUserSerializer
-
-from foodgram.models import (Favorite, Ingredient, Purchase, Recipe,
-                               RecipeIngredient, Subscription, Tag)
 
 
 class TagSerializer(serializers.ModelSerializer):
