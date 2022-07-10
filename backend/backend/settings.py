@@ -10,9 +10,9 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '51.250.80.61']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -70,7 +70,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 # For prod mode
-""" DATABASES = {
+DATABASES = {
     'default': {
         'ENGINE': os.getenv(
             'DB_ENGINE', default='django.db.backends.postgresql'
@@ -81,15 +81,15 @@ WSGI_APPLICATION = 'backend.wsgi.application'
         'HOST': os.getenv('DB_HOST', default='db'),
         'PORT': os.getenv('DB_PORT', default='5432'),
     }
-} """
+}
 
 # For dev mode
-DATABASES = {
+""" DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
-}
+} """
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 
