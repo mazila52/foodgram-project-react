@@ -1,11 +1,8 @@
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
 
-
-from foodgram.models import (Favorite, Ingredient, Purchase,
-                             Recipe, RecipeIngredient, Subscription, Tag)
-from users.models import User
+from foodgram.models import (Favorite, Ingredient, Purchase, Recipe,
+                             RecipeIngredient, Subscription, Tag)
 from users.serializers import CustomUserSerializer
 
 
@@ -18,11 +15,14 @@ class TagSerializer(serializers.ModelSerializer):
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
-        fields = ('name', 'measurement_unit', 'ing_recipes')
+        fields = ('id', 'name', 'measurement_unit')
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
-    id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
+    id = serializers.PrimaryKeyRelatedField(
+        source='ingredient',
+        queryset=Ingredient.objects.all()
+    )
 
     class Meta:
         model = RecipeIngredient
@@ -85,14 +85,13 @@ class RecipeListSerializer(serializers.ModelSerializer):
 
 
 class RecipePostSerializer(serializers.ModelSerializer):
-    author = serializers.PrimaryKeyRelatedField(
-        read_only=True,
-        default=serializers.CurrentUserDefault()
-    )
+    author = CustomUserSerializer(read_only=True)
+    is_favorited = serializers.SerializerMethodField()
+    is_in_shopping_cart = serializers.SerializerMethodField()
+
     ingredients = RecipeIngredientSerializer(
         source='ing_in_recipe',
         many=True,
-        required=False
     )
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
@@ -103,8 +102,9 @@ class RecipePostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = (
-            'author', 'ingredients', 'tags',
-            'image', 'name', 'text', 'cooking_time'
+            'id', 'author', 'ingredients', 'tags',
+            'image', 'name', 'text', 'cooking_time',
+            'is_favorited', 'is_in_shopping_cart'
         )
 
     def validate_tags(self, tags):
@@ -119,7 +119,7 @@ class RecipePostSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Не выбраны ингредиенты!')
         ingredient_list = []
         for ingredient in ingredients:
-            ingredient_id = ingredient.get('id')
+            ingredient_id = ingredient.get('ingredient')
             if ingredient_id in ingredient_list:
                 raise serializers.ValidationError(
                     'Ингредиенты не должны повторяться'
@@ -130,7 +130,7 @@ class RecipePostSerializer(serializers.ModelSerializer):
     def _add_ingredients(self, recipe, ingredients):
         temp_list = []
         for ingredient in ingredients:
-            ingredient_id = ingredient.get('id')
+            ingredient_id = ingredient.get('ingredient')
             amount = ingredient.get('amount')
             temp_list.append(
                 RecipeIngredient(
@@ -158,34 +158,51 @@ class RecipePostSerializer(serializers.ModelSerializer):
         self._add_ingredients(instance, ingredients)
         return super().update(instance, validated_data)
 
+    def get_is_favorited(self, obj):
+        request = self.context.get('request')
+        if not request or request.user.is_anonymous:
+            return False
+        return Favorite.objects.filter(
+            user=request.user,
+            recipe=obj
+        ).exists()
+
+    def get_is_in_shopping_cart(self, obj):
+        request = self.context.get('request')
+        if not request or request.user.is_anonymous:
+            return False
+        return Purchase.objects.filter(
+            user=request.user,
+            recipe=obj
+        ).exists()
+
 
 class SubscriptionSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(
-        read_only=True,
-        default=serializers.CurrentUserDefault()
-    )
-    subscribed_to = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all()
-    )
+    id = serializers.IntegerField(source='subscribed_to.id')
+    email = serializers.EmailField(source='subscribed_to.email')
+    first_name = serializers.CharField(source='subscribed_to.first_name')
+    last_name = serializers.CharField(source='subscribed_to.last_name')
+    recipes = serializers.SerializerMethodField()
 
     class Meta:
         model = Subscription
-        fields = ('user', 'is_subscribed')
+        fields = (
+            'id', 'email', 'first_name',
+            'last_name', 'recipes'
+        )
 
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Subscription.objects.all(),
-                fields=('user', 'subscribed_to')
-            )
-        ]
-
-    def validate_subscribed_to(self, is_subscribed):
-        user = self.context['request'].user
-        if user == is_subscribed:
-            raise serializers.ValidationError(
-                'Нельзя подписаться на самого себя'
-            )
-        return is_subscribed
+    def get_recipes(self, obj):
+        request = self.context.get('request')
+        if request.GET.get('recipes_limit'):
+            recipes_limit = int(request.GET.get('recipes_limit'))
+            queryset = Recipe.objects.filter(
+                author=obj.subscribed_to
+            ).order_by('id')[:recipes_limit]
+        else:
+            queryset = Recipe.objects.filter(
+                author=obj.subscribed_to
+            ).order_by('id')
+        return MiniRecipesSerializer(queryset, many=True).data
 
 
 class FavoritesSerializer(serializers.ModelSerializer):
@@ -208,3 +225,9 @@ class PurchaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Purchase
         fields = ('user', 'recipe')
+
+
+class MiniRecipesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'cooking_time', 'image')

@@ -69,7 +69,8 @@ class Recipe(models.Model):
     )
     tags = models.ManyToManyField(
         Tag,
-        verbose_name='Тэги'
+        verbose_name='Тэги',
+        related_name='teg_recipes'
     )
     image = models.ImageField(
         verbose_name='Изображение',

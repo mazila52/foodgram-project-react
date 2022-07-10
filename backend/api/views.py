@@ -6,16 +6,18 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, mixins, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from .filters import RecipeFilter
+from .filters import IngredientFilter, RecipeFilter
 from .paginators import RecipesCustomPagination
 from .permissions import OwnerOrReadOnly
 from .serilalizers import (FavoritesSerializer, IngredientSerializer,
                            PurchaseSerializer, RecipeListSerializer,
                            RecipePostSerializer, SubscriptionSerializer,
                            TagSerializer)
+
 from foodgram.models import (Favorite, Ingredient, Purchase, Recipe,
                              RecipeIngredient, Subscription, Tag)
 
@@ -104,9 +106,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
 class SubscriptionList(generics.ListAPIView):
     serializer_class = SubscriptionSerializer
+    pagination_class = RecipesCustomPagination
 
     def get_queryset(self):
-        return Subscription.objects.filter(user__id=self.request.user.id)
+        return Subscription.objects.filter(user=self.request.user)
 
 
 class IngredientViewSet(
@@ -117,6 +120,7 @@ class IngredientViewSet(
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = [AllowAny, ]
-    ordering_fileds = ('name')
-    filter_backends = (DjangoFilterBackend,)
-    filterset_fileds = ('name',)
+    filter_backends = (IngredientFilter, OrderingFilter)
+    pagination_class = None
+    search_fields = ['^name']
+    ordering_fields = ('id',)
