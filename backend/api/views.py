@@ -1,4 +1,5 @@
 import csv
+from http import HTTPStatus
 
 from django.db.models import Sum
 from django.http import HttpResponse
@@ -7,7 +8,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from .filters import IngredientFilter, RecipeFilter
@@ -20,6 +21,7 @@ from .serilalizers import (FavoritesSerializer, IngredientSerializer,
 
 from foodgram.models import (Favorite, Ingredient, Purchase, Recipe,
                              RecipeIngredient, Subscription, Tag)
+from users.models import User
 
 
 class TagViewSet(mixins.ListModelMixin,
@@ -110,6 +112,28 @@ class SubscriptionList(generics.ListAPIView):
 
     def get_queryset(self):
         return Subscription.objects.filter(user=self.request.user)
+
+
+class SubscribeViewSet(viewsets.ModelViewSet):
+    serializer_class = SubscriptionSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Subscription.objects.filter(user=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        user = request.user
+        user_id = self.kwargs.get('users_id')
+        subscribed_to = get_object_or_404(User, id=user_id)
+        Subscription.objects.get_or_create(user=user, subscribed_to=subscribed_to)
+        return Response(HTTPStatus.CREATED)
+
+    def delete(self, request, *args, **kwargs):
+        user = request.user
+        user_id = self.kwargs.get('users_id')
+        subscribed_to = get_object_or_404(User, id=user_id)
+        Subscription.objects.filter(user=user, subscribed_to=subscribed_to).delete()
+        return Response(HTTPStatus.NO_CONTENT)
 
 
 class IngredientViewSet(
