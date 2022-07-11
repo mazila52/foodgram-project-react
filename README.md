@@ -68,3 +68,7 @@ docker-compose exec backend python manage.py createsuperuser
 
 
 ### Запущенный проект - [тут](http://51.250.80.61)
+
+### Admin
+Login: auser@yandex.ru
+Passwoed: adminadmin123
