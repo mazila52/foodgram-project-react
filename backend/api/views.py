@@ -38,7 +38,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = [OwnerOrReadOnly, ]
     filter_backends = (DjangoFilterBackend, RecipeFilter)
     filterset_fileds = ('tags__slug',)
-    ordering = ('-id')
     pagination_class = RecipesCustomPagination
 
     def get_serializer_class(self):
@@ -125,14 +124,20 @@ class SubscribeViewSet(viewsets.ModelViewSet):
         user = request.user
         user_id = self.kwargs.get('users_id')
         subscribed_to = get_object_or_404(User, id=user_id)
-        Subscription.objects.get_or_create(user=user, subscribed_to=subscribed_to)
+        Subscription.objects.get_or_create(
+            user=user,
+            subscribed_to=subscribed_to
+        )
         return Response(HTTPStatus.CREATED)
 
     def delete(self, request, *args, **kwargs):
         user = request.user
         user_id = self.kwargs.get('users_id')
         subscribed_to = get_object_or_404(User, id=user_id)
-        Subscription.objects.filter(user=user, subscribed_to=subscribed_to).delete()
+        Subscription.objects.filter(
+            user=user,
+            subscribed_to=subscribed_to
+        ).delete()
         return Response(HTTPStatus.NO_CONTENT)
 
 

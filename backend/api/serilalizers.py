@@ -197,11 +197,11 @@ class SubscriptionSerializer(serializers.ModelSerializer):
             recipes_limit = int(request.GET.get('recipes_limit'))
             queryset = Recipe.objects.filter(
                 author=obj.subscribed_to
-            ).order_by('id')[:recipes_limit]
+            ).order_by('-id')[:recipes_limit]
         else:
             queryset = Recipe.objects.filter(
                 author=obj.subscribed_to
-            ).order_by('id')
+            ).order_by('-id')
         return MiniRecipesSerializer(queryset, many=True).data
 
 
