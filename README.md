@@ -71,4 +71,5 @@ docker-compose exec backend python manage.py createsuperuser
 
 ### Admin
 Login: auser@yandex.ru
-Passwoed: adminadmin123
+
+Password: adminadmin123
