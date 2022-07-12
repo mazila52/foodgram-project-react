@@ -53,7 +53,7 @@ class RecipeListSerializer(serializers.ModelSerializer):
         many=True,
         read_only=True
     )
-    image = Base64ImageField(max_length=None, use_url=False,)
+    image = Base64ImageField(max_length=None)
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
 
@@ -183,12 +183,13 @@ class SubscriptionSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source='subscribed_to.first_name')
     last_name = serializers.CharField(source='subscribed_to.last_name')
     recipes = serializers.SerializerMethodField()
+    recipes_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Subscription
         fields = (
             'id', 'email', 'first_name',
-            'last_name', 'recipes'
+            'last_name', 'recipes', 'recipes_count'
         )
 
     def get_recipes(self, obj):
@@ -203,6 +204,9 @@ class SubscriptionSerializer(serializers.ModelSerializer):
                 author=obj.subscribed_to
             ).order_by('-id')
         return MiniRecipesSerializer(queryset, many=True).data
+
+    def get_recipes_count(self, obj):
+        return Recipe.objects.filter(author=obj.subscribed_to).count()
 
 
 class FavoritesSerializer(serializers.ModelSerializer):

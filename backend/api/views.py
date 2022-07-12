@@ -54,6 +54,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer = input_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save(user=user)
+        return Response(HTTPStatus.CREATED)
 
     def _del_favorite_or_purchase(self, request, pk, model):
         user = request.user
@@ -63,8 +64,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post', ])
     def favorite(self, request, pk):
-        self._add_favorite_or_purchase(request, pk, FavoritesSerializer)
-        return Response(status=status.HTTP_201_CREATED)
+        return self._add_favorite_or_purchase(request, pk, FavoritesSerializer)
 
     @favorite.mapping.delete
     def delete_favorite(self, request, pk):
@@ -73,8 +73,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post', ])
     def shopping_cart(self, request, pk):
-        self._add_favorite_or_purchase(request, pk, PurchaseSerializer)
-        return Response(status=status.HTTP_201_CREATED)
+        return self._add_favorite_or_purchase(request, pk, PurchaseSerializer)
 
     @shopping_cart.mapping.delete
     def delete_shopping_cart(self, request, pk):
