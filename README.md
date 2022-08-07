@@ -67,9 +67,4 @@ docker-compose exec backend python manage.py createsuperuser
 - **Frontend** - [Яндекс.Практикум] (https://github.com/yandex-praktikum/)
 
 
-### Запущенный проект - [тут](http://51.250.80.61)
-
-### Admin
-Login: auser@yandex.ru
-
-Password: adminadmin123
+### Запущенный проект - [тут](http://51.250.75.67)
