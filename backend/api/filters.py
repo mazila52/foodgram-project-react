@@ -30,7 +30,7 @@ class RecipeFilter(BaseFilterBackend):
         )
         queryset = queryset.annotate(
             is_favor=Exists(is_favor)
-            ).annotate(in_cart=Exists(in_cart))
+        ).annotate(in_cart=Exists(in_cart))
         if is_favorited == '1':
             queryset = queryset.filter(is_favor=True)
         if is_in_shopping == '1':

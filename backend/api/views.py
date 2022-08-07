@@ -84,7 +84,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def download_shopping_cart(self, request):
         ingredients = RecipeIngredient.objects.filter(
             recipe__purchase__user=request.user
-            ).values(
+        ).values(
             'ingredient__name',
             'ingredient__measurement_unit'
         ).annotate(
