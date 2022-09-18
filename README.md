@@ -52,7 +52,7 @@ sudo docker-compose up -d --build
 ```bash  
 docker-compose exec backend python manage.py migrate
 
-docker-compose exec web python manage.py collectstatic --no-input
+docker-compose exec backend python manage.py collectstatic --no-input
 ```
 
 - Создать суперпользователя:
@@ -68,4 +68,4 @@ docker-compose exec backend python manage.py createsuperuser
 - **Frontend** - [Яндекс.Практикум] (https://github.com/yandex-praktikum/)
 
 
-### Запущенный проект - [тут](http://51.250.75.67)
+### Запущенный проект - [тут](http://94.103.89.48)
