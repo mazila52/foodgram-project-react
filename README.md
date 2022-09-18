@@ -1,8 +1,9 @@
-![example workflow](https://github.com/mazila52/yamdb_final/actions/workflows/yamdb_workflow.yaml/badge.svg)
+![example workflow](https://github.com/mazila52//foodgram-project-react/actions/workflows/foodgram_workflow.yaml/badge.svg)
 # Foodgram
+![изображение](https://user-images.githubusercontent.com/66749138/183753877-61660c13-d852-4a8f-a4f6-b1b151de2e0f.png)
 ## Описание проекта
  
-Foodgram - онлайн-сервис и API для него, пыполнящие роль "продуктового помощника".
+Foodgram - онлайн-сервис и API для него, выполнящие роль "продуктового помощника".
 В этом сервисе пользователи смогут публиковать рецепты, подписываться на публикации других пользователей, добавлять понравившиеся рецепты в список «Избранное», а перед походом в магазин скачивать сводный список продуктов, необходимых для приготовления одного или нескольких выбранных блюд.
  
 ### Стэк технологий 
